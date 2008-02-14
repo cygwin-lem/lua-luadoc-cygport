@@ -1,0 +1,79 @@
+luadoc
+------------------------------------------
+LuaDoc is a documentation generator tool for Lua source code. It parses 
+the declarations and documentation comments in a set of Lua source files 
+and produces a set of XHTML pages describing the commented declarations 
+and functions.
+
+Runtime requirements:
+  lua-5.1.3-1
+  lua-filesystem-1.3.0-1
+  lua-logging-1.1.4-1
+
+Build requirements:
+  cygport-0.3.8-1
+  make-3.81-1
+
+Canonical website:
+  http://luaforge.net/projects/
+
+Canonical download:
+  http://luaforge.net/projects/  
+
+-------------------------------------------
+
+Build instructions:
+  unpack luadoc-3.0-X-src.tar.bz2
+    if you use setup to install this src package, it will be
+	 unpacked under /usr/src automatically
+  cd /usr/src
+  cygport ./luadoc-3.0-X.cygport all
+
+This will create:
+  /usr/src/luadoc-3.0-X-src.tar.bz2
+  /usr/src/luadoc-3.0-X.tar.bz2
+
+-------------------------------------------
+
+Files included in the binary package:
+
+  /usr/bin/luadoc
+  /usr/share/doc/luadoc-3.0/README
+  /usr/share/doc/luadoc-3.0/html/architecture.html
+  /usr/share/doc/luadoc-3.0/html/architecture.vsd
+  /usr/share/doc/luadoc-3.0/html/architecture_h.png
+  /usr/share/doc/luadoc-3.0/html/architecture_v.png
+  /usr/share/doc/luadoc-3.0/html/email.png
+  /usr/share/doc/luadoc-3.0/html/examples.html
+  /usr/share/doc/luadoc-3.0/html/index.html
+  /usr/share/doc/luadoc-3.0/html/license.html
+  /usr/share/doc/luadoc-3.0/html/lua.png
+  /usr/share/doc/luadoc-3.0/html/manual.html
+  /usr/share/lua/5.1/luadoc/config.lua
+  /usr/share/lua/5.1/luadoc/doclet/debug.lua
+  /usr/share/lua/5.1/luadoc/doclet/formatter.lua
+  /usr/share/lua/5.1/luadoc/doclet/html.lua
+  /usr/share/lua/5.1/luadoc/doclet/html/file.lp
+  /usr/share/lua/5.1/luadoc/doclet/html/function.lp
+  /usr/share/lua/5.1/luadoc/doclet/html/index.lp
+  /usr/share/lua/5.1/luadoc/doclet/html/luadoc.css
+  /usr/share/lua/5.1/luadoc/doclet/html/menu.lp
+  /usr/share/lua/5.1/luadoc/doclet/html/module.lp
+  /usr/share/lua/5.1/luadoc/doclet/html/table.lp
+  /usr/share/lua/5.1/luadoc/doclet/raw.lua
+  /usr/share/lua/5.1/luadoc/init.lua
+  /usr/share/lua/5.1/luadoc/lp.lua
+  /usr/share/lua/5.1/luadoc/taglet/standard.lua
+  /usr/share/lua/5.1/luadoc/taglet/standard/tags.lua
+  /usr/share/lua/5.1/luadoc/util.lua
+
+------------------
+
+Port Notes:
+
+----- version 3.0-1 -----
+Initial release for Cygwin.
+
+
+Cygwin port maintained by:
+http://cygwinports.dotsrc.org/

@@ -1,0 +1,7 @@
+category: Doc Lua
+requires: lua lua-filesystem lua-logging
+sdesc: "Lua documentation generator"
+ldesc: "LuaDoc is a documentation generator tool for Lua source code. It 
+parses the declarations and documentation comments in a set of Lua 
+source files and produces a set of XHTML pages describing the commented 
+declarations and functions."
