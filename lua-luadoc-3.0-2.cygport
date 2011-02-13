@@ -1,8 +1,9 @@
+ORIG_PN="luadoc"
 inherit lua
 
 DESCRIPTION="Lua documentation generator"
 HOMEPAGE="http://luadoc.luaforge.net/"
-SRC_URI="http://luaforge.net/frs/download.php/2557/${P}.tar.gz"
+SRC_URI="http://luaforge.net/frs/download.php/2557/${ORIG_PN}-${PV}.tar.gz"
 
 src_compile() { :; }
 
@@ -11,6 +12,7 @@ src_install() {
 	cyginstall \
 		LUA_DIR=${D}${LUA_SCRIPTDIR} \
 		LAUNCHER_DIR=${D}/usr/bin
+	lua_fix_shebang /usr/bin/luadoc
 }
 
 HTMLDOCS="doc/us/*.*"
