@@ -2,7 +2,7 @@ inherit lua
 
 NAME="lua-luadoc"
 VERSION=3.0.1
-RELEASE=1
+RELEASE=2
 CATEGORY="Lua"
 SUMMARY="Lua documentation generator"
 DESCRIPTION="LuaDoc is a documentation generator tool for Lua source code. It
