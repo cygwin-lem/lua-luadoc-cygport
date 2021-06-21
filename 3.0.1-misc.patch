@@ -1,0 +1,213 @@
+--- origsrc/luadoc-51577bf45502c0fb3ccabdef72fb20a549c63308/src/luadoc/doclet/formatter.lua	2016-01-06 21:31:44.000000000 +0900
++++ src/luadoc-51577bf45502c0fb3ccabdef72fb20a549c63308/src/luadoc/doclet/formatter.lua	2021-02-06 21:09:46.931923600 +0900
+@@ -55,16 +55,16 @@ function start (doc)
+ 			
+ 			if block.class == "function" then
+ 				-- parameters
+-				table.foreachi(block.param, function (_, param_name)
++				for _, param_name in pairs(block.param) do
+ 					f:write(util.comment(util.wrap(string.format("@param %s %s", param_name, block.param[param_name] or todo), 77)))
+ 					f:write("\n")
+-				end)
++				end
+ 				
+ 				-- return
+ 				if type(block.ret) == "table" then
+-					table.foreachi(block.ret, function (_, ret)
++					for _, ret in pairs(block.ret) do
+ 						f:write(util.comment(util.wrap(string.format("@return %s", ret), 77)).."\n")
+-					end)
++					end
+ 				else
+ 					f:write(util.comment(util.wrap(string.format("@return %s", block.ret or todo), 77)).."\n")
+ 				end
+--- origsrc/luadoc-51577bf45502c0fb3ccabdef72fb20a549c63308/src/luadoc/doclet/html.lua	2021-02-06 19:54:13.086953000 +0900
++++ src/luadoc-51577bf45502c0fb3ccabdef72fb20a549c63308/src/luadoc/doclet/html.lua	2021-02-06 21:15:17.076122700 +0900
+@@ -32,7 +32,7 @@ module "luadoc.doclet.html"
+ --	or nil in case the file is not found.
+ 
+ local function search (path, name)
+-  for c in string.gfind(path, "[^;]+") do
++  for c in string.gmatch(path, "[^;]+") do
+     c = string.gsub(c, "%?", name)
+     local f = io.open(c)
+     if f then   -- file exist?
+--- origsrc/luadoc-51577bf45502c0fb3ccabdef72fb20a549c63308/src/luadoc/lp.lua	2016-01-06 21:31:44.000000000 +0900
++++ src/luadoc-51577bf45502c0fb3ccabdef72fb20a549c63308/src/luadoc/lp.lua	2021-02-06 21:35:21.708714900 +0900
+@@ -12,6 +12,19 @@ local open = io.open
+ module (...)
+ 
+ ----------------------------------------------------------------------------
++-- function getfenv from http://lua-users.org/lists/lua-l/2010-06/msg00314.html
++getfenv = function(f)
++    f = (type(f) == 'function' and f or debug.getinfo(f + 1, 'f').func)
++    local name, val
++    local up = 0
++    repeat
++        up = up + 1
++        name, val = debug.getupvalue(f, up)
++    until name == '_ENV' or name == nil
++    return val
++end
++
++----------------------------------------------------------------------------
+ -- function to do output
+ local outfunc = "io.write"
+ -- accepts the old expression field: `$| <Lua expression> |$'
+--- origsrc/luadoc-51577bf45502c0fb3ccabdef72fb20a549c63308/src/luadoc/taglet/standard/tags.lua	2016-01-06 21:31:44.000000000 +0900
++++ src/luadoc-51577bf45502c0fb3ccabdef72fb20a549c63308/src/luadoc/taglet/standard/tags.lua	2021-02-06 21:11:18.979038000 +0900
+@@ -83,11 +83,13 @@ local function param (tag, block, text)
+ 		luadoc.logger:warn("parameter `name' not defined [["..text.."]]: skipping")
+ 		return
+ 	end
+-	local i = table.foreachi(block[tag], function (i, v)
++	local i
++	for _i, v in pairs(block[tag]) do
+ 		if v == name then
+-			return i
++			i = _i
++			break
+ 		end
+-	end)
++	end
+ 	if i == nil then
+ 		luadoc.logger:warn(string.format("documenting undefined parameter `%s'", name))
+ 		table.insert(block[tag], name)
+@@ -126,9 +128,9 @@ local function see (tag, block, text)
+ 	
+ 	local s = util.split("%s*,%s*", text)			
+ 	
+-	table.foreachi(s, function (_, v)
++	for _, v in pairs(s) do
+ 		table.insert(block[tag], v)
+-	end)
++	end
+ end
+ 
+ -------------------------------------------------------------------------------
+--- origsrc/luadoc-51577bf45502c0fb3ccabdef72fb20a549c63308/src/luadoc/taglet/standard.lua	2016-01-06 21:31:44.000000000 +0900
++++ src/luadoc-51577bf45502c0fb3ccabdef72fb20a549c63308/src/luadoc/taglet/standard.lua	2021-02-06 21:04:06.801756000 +0900
+@@ -49,16 +49,18 @@ local function_patterns = {
+ local function check_function (line)
+ 	line = util.trim(line)
+ 
+-	local info = table.foreachi(function_patterns, function (_, pattern)
++	local info
++	for k, pattern in pairs(function_patterns) do
+ 		local r, _, l, id, param = string.find(line, pattern)
+ 		if r ~= nil then
+-			return {
++			info = {
+ 				name = id,
+ 				private = (l == "local"),
+ 				param = util.split("%s*,%s*", param),
+ 			}
++			break
+ 		end
+-	end)
++	end
+ 
+ 	-- TODO: remove these assert's?
+ 	if info ~= nil then
+@@ -154,7 +156,8 @@ end
+ local function parse_comment (block, first_line)
+ 
+ 	-- get the first non-empty line of code
+-	local code = table.foreachi(block.code, function(_, line)
++	local code
++	for _, line in pairs(block.code) do
+ 		if not util.line_empty(line) then
+ 			-- `local' declarations are ignored in two cases:
+ 			-- when the `nolocals' option is turned on; and
+@@ -162,11 +165,12 @@ local function parse_comment (block, fir
+ 			--	necessary to avoid confusion between the top
+ 			--	local declarations and the `module' definition.
+ 			if (options.nolocals or first_line) and line:find"^%s*local" then
+-				return
++			else
++				code = line
++				break
+ 			end
+-			return line
+ 		end
+-	end)
++	end
+ 
+ 	-- parse first line of code
+ 	if code ~= nil then
+@@ -195,7 +199,7 @@ local function parse_comment (block, fir
+ 	local ocurrenttext		-- concatenated lines with linebreaks (eg. original non-stripped text format)
+     local currenttagpostfix -- postfix '#' for current tag
+ 
+-	table.foreachi(block.comment, function (_, line)
++	for _, line in pairs(block.comment) do
+ 		tline = util.trim_comment(line)
+ 		oline = util.no_trim_comment(line)
+ 
+@@ -214,7 +218,7 @@ local function parse_comment (block, fir
+ 			ocurrenttext = util.no_concat(ocurrenttext, oline)
+ 			assert(string.sub(currenttext, 1, 1) ~= " ", string.format("`%s', `%s'", currenttext, tline))
+ 		end
+-	end)
++	end
+     if currenttagpostfix == "#" then
+         tags.handle(currenttag, block, ocurrenttext)    -- dispatch text with original linebreaks and indentations
+     else
+@@ -328,9 +332,9 @@ function parse_file (filepath, doc)
+ 		end
+ 		if doc.modules[modulename] ~= nil then
+ 			-- module is already defined, just add the blocks
+-			table.foreachi(blocks, function (_, v)
++			for _, v in pairs(blocks) do
+ 				table.insert(doc.modules[modulename].doc, v)
+-			end)
++			end
+ 		else
+ 			-- TODO: put this in a different module
+ 			table.insert(doc.modules, modulename)
+@@ -414,11 +418,13 @@ end
+ 
+ function file (filepath, doc)
+ 	local patterns = { "%.lua$", "%.luadoc$" }
+-	local valid = table.foreachi(patterns, function (_, pattern)
++	local valid
++        for k, pattern in pairs(patterns) do 
+ 		if string.find(filepath, pattern) ~= nil then
+-			return true
++			valid = true
++			break
+ 		end
+-	end)
++	end
+ 
+ 	if valid then
+ 		logger:info(string.format("processing file `%s'", filepath))
+@@ -476,7 +482,7 @@ function start (files, doc)
+ 	assert(doc.files, "undefined `files' field")
+ 	assert(doc.modules, "undefined `modules' field")
+ 
+-	table.foreachi(files, function (_, path)
++	for _, path in pairs(files) do
+ 		local attr = lfs.attributes(path)
+ 		assert(attr, string.format("error stating path `%s'", path))
+ 
+@@ -485,7 +491,7 @@ function start (files, doc)
+ 		elseif attr.mode == "directory" then
+ 			doc = directory(path, doc)
+ 		end
+-	end)
++	end
+ 
+ 	-- order arrays alphabetically
+ 	recsort(doc.files)
+--- origsrc/luadoc-51577bf45502c0fb3ccabdef72fb20a549c63308/src/luadoc/util.lua	2016-01-06 21:31:44.000000000 +0900
++++ src/luadoc-51577bf45502c0fb3ccabdef72fb20a549c63308/src/luadoc/util.lua	2021-02-06 21:13:44.393337500 +0900
+@@ -149,7 +149,7 @@ function lfs.open (filename, mode)
+ 	if f == nil then
+ 		filename = string.gsub(filename, "\\", "/")
+ 		local dir = ""
+-		for d in string.gfind(filename, ".-/") do
++		for d in string.gmatch(filename, ".-/") do
+ 			dir = dir .. d
+ 			lfs.mkdir(dir)
+ 		end
