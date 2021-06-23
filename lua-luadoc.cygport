@@ -5,15 +5,28 @@ VERSION=3.0.1
 RELEASE=2
 CATEGORY="Lua"
 SUMMARY="Lua documentation generator"
-DESCRIPTION="LuaDoc is a documentation generator tool for Lua source code. It
+DESCRIPTION="\
+*** LuaDoc is obsolete. Use LDoc instead. ***
+LuaDoc is a documentation generator tool for Lua source code. It
 parses the declarations and documentation comments in a set of Lua source files
 and produces a set of XHTML pages describing the commented declarations and
-functions."
-HOMEPAGE="http://luadoc.luaforge.net/"
-SRC_URI="http://luaforge.net/frs/download.php/3185/luadoc-${VERSION}.tar.gz"
-SRC_DIR="luadoc-${VERSION}"
+functions.
+"
+HOMEPAGE="https://github.com/keplerproject/luadoc/"
 
-ARCH=noarch
+GIT_REPO="https://github.com/keplerproject/luadoc"
+declare -A GIT_DATEHASH_BY_NAME=(
+  # git log --date=iso-strict --format='%cd/%H' -1
+  [3.0.1]=2016-01-06T15:31:44+03:00/51577bf45502c0fb3ccabdef72fb20a549c63308
+)
+REV_HASH="${GIT_DATEHASH_BY_NAME[${VERSION}]#*/}"
+REV_DATE="${GIT_DATEHASH_BY_NAME[${VERSION}]%%/*}"
+REV_DATE_SHORT="${REV_DATE%%T*}"
+GIT_BASENAME="${GIT_REPO##*/}"
+SRC_URI="${GIT_REPO}/archive/${REV_HASH}/${GIT_BASENAME}-${VERSION}.tar.gz"
+SRC_DIR="${GIT_BASENAME}-${REV_HASH#v}"
+
+ARCH="noarch"
 
 src_compile() { :; }
 
